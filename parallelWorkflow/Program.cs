@@ -117,12 +117,26 @@ namespace WorkflowParallelSample
 //SayGoodbye
 
 
+//public class MyData
+//{
+//    public bool IsApproved { get; set; }
+//}
 
-//builder
-//    .StartWith<CheckUserStatus>()
-//    .Decide(data => ((MyData)data).IsApproved)
-//        .Branch(true, then => then.StartWith<SendWelcomeEmail>())
-//        .Branch(false, then => then.StartWith<SendRejectionEmail>());
+//public class ConditionalWorkflow : IWorkflow<MyData>
+//{
+//    public void Build(IWorkflowBuilder<MyData> builder)
+//    {
+//        builder
+//            .StartWith<CheckUserStatus>()
+//            .Decide(data => data.IsApproved)
+//                .Branch(true, then => then.StartWith<SendWelcomeEmail>())
+//                .Branch(false, then => then.StartWith<SendRejectionEmail>());
+//    }
+
+//    public string Id => "conditional-workflow";
+//    public int Version => 1;
+//}
+
 
 //+-------------------+
 //| CheckUserStatus |
