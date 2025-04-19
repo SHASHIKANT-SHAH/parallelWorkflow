@@ -117,25 +117,125 @@ namespace WorkflowParallelSample
 //SayGoodbye
 
 
-//public class MyData
-//{
-//    public bool IsApproved { get; set; }
-//}
+//using System;
+//using System.Threading.Tasks;
+//using Microsoft.Extensions.DependencyInjection;
+//using WorkflowCore.Interface;
+//using WorkflowCore.Models;
 
-//public class ConditionalWorkflow : IWorkflow<MyData>
+//namespace ConditionalWorkflowDemo
 //{
-//    public void Build(IWorkflowBuilder<MyData> builder)
+//    class Program
 //    {
-//        builder
-//            .StartWith<CheckUserStatus>()
-//            .Decide(data => data.IsApproved)
-//                .Branch(true, then => then.StartWith<SendWelcomeEmail>())
-//                .Branch(false, then => then.StartWith<SendRejectionEmail>());
+//        static async Task Main(string[] args)
+//        {
+//            var serviceProvider = ConfigureServices();
+//            var host = serviceProvider.GetService<IWorkflowHost>();
+
+//            host.RegisterWorkflow<ConditionalWorkflow, MyData>();
+
+//            host.Start();
+
+//            // Run workflow for true
+//            Console.WriteLine("Running workflow with IsApproved = true");
+//            await host.StartWorkflow("conditional-workflow", new MyData { IsApproved = true, StatusCode = 1 });
+
+//            // Run workflow for false
+//            Console.WriteLine("Running workflow with IsApproved = false");
+//            await host.StartWorkflow("conditional-workflow", new MyData { IsApproved = false, StatusCode = 0 });
+
+//            // Run workflow with a different status code
+//            Console.WriteLine("Running workflow with StatusCode = 2");
+//            await host.StartWorkflow("conditional-workflow", new MyData { IsApproved = false, StatusCode = 2 });
+
+//            Console.ReadKey();
+//            host.Stop();
+//        }
+
+//        private static IServiceProvider ConfigureServices()
+//        {
+//            var services = new ServiceCollection();
+//            services.AddLogging();
+//            services.AddWorkflow();
+//            return services.BuildServiceProvider();
+//        }
 //    }
 
-//    public string Id => "conditional-workflow";
-//    public int Version => 1;
+//    public class MyData
+//    {
+//        public bool IsApproved { get; set; }
+//        public int StatusCode { get; set; }
+//    }
+
+//    public class CheckUserStatus : StepBody
+//    {
+//        public override ExecutionResult Run(IStepExecutionContext context)
+//        {
+//            Console.WriteLine("Checking user status...");
+//            return ExecutionResult.Next();
+//        }
+//    }
+
+//    public class SendWelcomeEmail : StepBody
+//    {
+//        public override ExecutionResult Run(IStepExecutionContext context)
+//        {
+//            Console.WriteLine("User approved ✅: Sending welcome email.");
+//            return ExecutionResult.Next();
+//        }
+//    }
+
+//    public class SendRejectionEmail : StepBody
+//    {
+//        public override ExecutionResult Run(IStepExecutionContext context)
+//        {
+//            Console.WriteLine("User rejected ❌: Sending rejection email.");
+//            return ExecutionResult.Next();
+//        }
+//    }
+
+//    public class SendPendingNotification : StepBody
+//    {
+//        public override ExecutionResult Run(IStepExecutionContext context)
+//        {
+//            Console.WriteLine("User status is pending ⏳: Sending notification.");
+//            return ExecutionResult.Next();
+//        }
+//    }
+
+//    public class SendInvalidStatusNotification : StepBody
+//    {
+//        public override ExecutionResult Run(IStepExecutionContext context)
+//        {
+//            Console.WriteLine("Unknown status ❓: Sending alert to admin.");
+//            return ExecutionResult.Next();
+//        }
+//    }
+
+//    public class ConditionalWorkflow : IWorkflow<MyData>
+//    {
+//        public string Id => "conditional-workflow";
+//        public int Version => 1;
+
+//        public void Build(IWorkflowBuilder<MyData> builder)
+//        {
+//            builder
+//                .StartWith<CheckUserStatus>()
+
+//                // 1. Basic if-else condition
+//                .Decide(data => data.IsApproved)
+//                    .Branch(true, then => then.StartWith<SendWelcomeEmail>())
+//                    .Branch(false, then =>
+//                        // 2. Nested Decide like switch-case on StatusCode
+//                        then.Decide(data => data.StatusCode)
+//                            .Branch(0, next => next.StartWith<SendRejectionEmail>())
+//                            .Branch(1, next => next.StartWith<SendPendingNotification>())
+//                            .Branch(2, next => next.StartWith<SendInvalidStatusNotification>())
+//                    );
+//        }
+//    }
 //}
+
 
 
 //+-------------------+
