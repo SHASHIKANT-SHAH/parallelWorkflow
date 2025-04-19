@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using WorkflowCore.Interface;
 using WorkflowCore.Models;
 using Microsoft.Extensions.DependencyInjection;
+using WorkflowParallelSample;
 
 namespace WorkflowParallelSample
 {
@@ -104,3 +105,34 @@ namespace WorkflowParallelSample
         }
     }
 }
+
+//SayHello
+//   |
+//Parallel
+// / | \
+//1  2  3
+// \ | /
+// Join
+//  |
+//SayGoodbye
+
+
+
+//builder
+//    .StartWith<CheckUserStatus>()
+//    .Decide(data => ((MyData)data).IsApproved)
+//        .Branch(true, then => then.StartWith<SendWelcomeEmail>())
+//        .Branch(false, then => then.StartWith<SendRejectionEmail>());
+
+//+-------------------+
+//| CheckUserStatus |
+//+--------+----------+
+//         |
+//         v
+//   IsApproved ?
+//    /      \
+//  Yes       No
+//  |          |
+//  v          v
+//SendWelcome  SendRejection
+
